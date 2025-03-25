@@ -5,6 +5,7 @@ FROM python:3.8-slim
 RUN apt-get update && apt-get install -y \
     gcc \
     build-essential \
+    cmake \
     && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory in the container
@@ -16,8 +17,8 @@ RUN mkdir -p /projects
 # Copy only requirements.txt first (Better Caching)
 COPY requirements.txt /app/
 
-# Install required Python packages
-RUN pip install --upgrade pip  # Upgrade pip
+# Upgrade pip and install dependencies
+RUN pip install --upgrade pip  
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the projects directory
@@ -33,4 +34,4 @@ ENV PROJECTS_DIR=/projects
 EXPOSE 8501
 
 # Run the Streamlit app when the container launches
-CMD ["streamlit", "run", "app.py", "--server.port=8501"]
+CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.enableCORS=false", "--server.enableXsrfProtection=false"]
