@@ -16,9 +16,8 @@ from src.utils import EntityNotFoundError
 from src.utils import get_reports_mapping
 from src.utils import list_periods
 
-PROJECTS_DIR: Path = Path("../projects")
+PROJECTS_DIR: Path = Path("projects")
 REPORTS_DIR_NAME: Text = "reports"
-
 
 if __name__ == "__main__":
 
@@ -27,12 +26,15 @@ if __name__ == "__main__":
 
     # Extract available project names and reports directory name
     projects: List[Text] = []
-    for path in os.listdir(PROJECTS_DIR):
-        if not path.startswith("."):
-            projects.append(path)
+    
+    if PROJECTS_DIR.exists():  # Check if the directory exists
+        for path in os.listdir(PROJECTS_DIR):
+            if not path.startswith("."):
+                projects.append(path)
+    else:
+        st.error(f"Error: {PROJECTS_DIR} does not exist. Please check the directory path.")
 
     try:
-
         # Sidebar: Logo and links
         display_sidebar_header()
 
@@ -46,7 +48,6 @@ if __name__ == "__main__":
         period_dir: Path = reports_dir / selected_period
 
         # Sidebar: Select report (UI)
-
         report_mapping: Dict[Text, Path] = get_reports_mapping(period_dir)
         selected_report_name: Text = select_report(report_mapping)
         selected_report: Path = report_mapping[selected_report_name]
@@ -61,8 +62,6 @@ if __name__ == "__main__":
         display_report(selected_report)
 
     except EntityNotFoundError as e:
-        # If some entity (periods directories, specific period or report files)
-        # not found then display error in UI
         st.error(e)
 
     except Exception as e:
